@@ -180,6 +180,8 @@ typedef struct bitmapfont_t {
     uint8_t pixels[ 1 ];
 } bitmapfont_t;
 
+static void use_system_pointer( app_t* app );
+
 // yarnspin files
 #ifndef YARNSPIN_RUNTIME_ONLY
     #include "gfxconv.h"
@@ -251,6 +253,7 @@ int app_proc( app_t* app, void* user_data ) {
 
     app_interpolation( app, yarn->globals.resolution >= YARN_RESOLUTION_FULL || ( yarn->globals.resolution == YARN_RESOLUTION_HIGH && yarn->globals.colormode == YARN_COLORMODE_RGB ) ? APP_INTERPOLATION_LINEAR : APP_INTERPOLATION_NONE );
     app_title( app, yarn->globals.title );
+    use_system_pointer( app );
 
     int frame_pc_width = 0;
     int frame_pc_height = 0;
@@ -1170,6 +1173,19 @@ int main( int argc, char** argv ) {
 #endif
 #define APP_LOG( ctx, level, message )
 #include "libs/app.h"
+
+// app.h copies the system arrow into a new cursor, and the copy drops inverting
+// pixels: with the Windows Inverted scheme, only the black outline remains.
+// Use the system cursor handle directly. It follows Windows pointer settings.
+// current_pointer is internal to app.h, which is vendored and has no API for this.
+static void use_system_pointer( app_t* app ) {
+    #ifdef _WIN32
+        app->current_pointer = LoadCursor( NULL, IDC_ARROW );
+        SetCursor( app->current_pointer );
+    #else
+        (void) app;
+    #endif
+}
 
 #define ARRAY_IMPLEMENTATION
 #include "libs/array.h"

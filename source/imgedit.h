@@ -1393,6 +1393,7 @@ int imgedit_proc( app_t* app, void* user_data ) {
     app_interpolation( app, APP_INTERPOLATION_NONE );
     app_screenmode( app, APP_SCREENMODE_WINDOW );
     app_title( app, "Yarnspin Image Editor" );
+    use_system_pointer( app );
 
     imgedit_t imgedit = { 0 };
     imgedit.single_image = -1;
